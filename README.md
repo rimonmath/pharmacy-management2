@@ -1,6 +1,7 @@
 # pharmacy-management2
 
-This template should help get you started developing with Vue 3 in Vite.
+Source code for the youtube tutorial series -
+(https://youtube.com/playlist?list=PLZ8kLhUbDAhDDuBaBUhoqyqA4dkblmS58&si=bvwpBs5KiVjEn4ze)
 
 ## Recommended IDE Setup
 
