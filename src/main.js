@@ -1,4 +1,8 @@
 // import './assets/main.css'
+// import "./assets/css/ayoflex.css";
+import 'ayoflex/dist/ayoflex.min.css';
+
+import './assets/css/example.css';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';

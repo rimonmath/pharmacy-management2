@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import TheButton from '@/components/TheButton.vue';
 
 const playList = 'Vue JS composition API';
 
@@ -40,7 +41,7 @@ onMounted(() => {
       <button class="ml-4" @click="completeVideo">+</button>
     </p>
 
-    <hr />
+    <hr class="my-4" />
 
     <input type="text" v-model="firstName" placeholder="First Name" />
     <input
@@ -52,7 +53,7 @@ onMounted(() => {
 
     <br />
     <br />
-    <button @click="getCertificate">Get certificate</button>
+    <TheButton block @click="getCertificate">Get certificate</TheButton>
   </div>
 </template>
 
