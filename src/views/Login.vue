@@ -1,20 +1,25 @@
-<script>
+<script setup>
 import axios from 'axios';
-import { mapState, mapActions } from 'pinia';
-import { eventBus } from '../utils/eventBus';
+
 import { setPrivateHeaders } from '../service/axiosInstance';
 import { showErrorMessage, showSuccessMessage } from '../utils/functions';
 import { infoStore } from '../data/info';
 import { useAuthStore } from '../store/authStore';
 import TheButton from '../components/TheButton.vue';
-import { reactive, ref } from 'vue';
+import { ref, shallowRef, shallowReactive } from 'vue';
+import { useRouter } from 'vue-router';
 
-const formData = reactive({
+const router = useRouter();
+
+const usernameEl = ref(null);
+const passwordEl = ref(null);
+
+const formData = shallowReactive({
   username: '',
   password: ''
 });
 
-const loggingIn = ref(false);
+const loggingIn = shallowRef(false);
 
 const authStore = useAuthStore();
 
@@ -23,14 +28,14 @@ function handleSubmit() {
     // TODO: show error message on toast
 
     showErrorMessage('username can not be empty!');
-    // this.$refs.username.focus();
+    usernameEl.value.focus();
     return;
   }
   if (formData.password.length < 6) {
     // alert("Password must be at least 6 characters long!");
     // TODO: show error message on toast
     showErrorMessage('Password must be at least 6 characters long!');
-    // this.$refs.password.focus();
+    passwordEl.value.focus();
 
     return;
   }
@@ -43,7 +48,7 @@ function handleSubmit() {
       authStore.login(res.data);
       localStorage.setItem('accessToken', res.data.accessToken);
       setPrivateHeaders();
-      // this.$router.push('/dashboard');
+      router.push('/dashboard');
     })
     .catch((err) => {
       showErrorMessage(err);
@@ -52,87 +57,11 @@ function handleSubmit() {
       loggingIn.value = false;
     });
 }
-
-// export default {
-//   data: () => ({
-//     formData: {
-//       username: '',
-//       password: ''
-//     },
-//     loggingIn: false,
-//     movedToRight: false,
-//     showing: false,
-//     projectName: infoStore.projectName
-//   }),
-//   computed: {
-//     ...mapState(useAuthStore, {
-//       username: 'username',
-//       accessToken: 'accessToken',
-//       refreshToken: 'refreshToken',
-//       isLoggedIn: 'isLoggedIn'
-//     })
-//   },
-//   components: {
-//     TheButton
-//   },
-//   methods: {
-//     ...mapActions(useAuthStore, {
-//       login: 'login'
-//     }),
-//     handleSubmit() {
-//       if (!this.formData.username) {
-//         // TODO: show error message on toast
-
-//         showErrorMessage('username can not be empty!');
-//         this.$refs.username.focus();
-//         return;
-//       }
-//       if (this.formData.password.length < 6) {
-//         // alert("Password must be at least 6 characters long!");
-//         // TODO: show error message on toast
-//         showErrorMessage('Password must be at least 6 characters long!');
-//         this.$refs.password.focus();
-
-//         return;
-//       }
-
-//       this.loggingIn = true;
-//       axios
-//         .post(
-//           'https://api.rimoned.com/api/pharmacy-management/v1/login',
-//           this.formData
-//         )
-//         .then((res) => {
-//           showSuccessMessage(res);
-//           this.login(res.data);
-//           localStorage.setItem('accessToken', res.data.accessToken);
-//           setPrivateHeaders();
-//           this.$router.push('/dashboard');
-//         })
-//         .catch((err) => {
-//           showErrorMessage(err);
-//         })
-//         .finally(() => {
-//           this.loggingIn = false;
-//         });
-//     }
-//   }
-// };
 </script>
 
 <template>
   <div class="login-page">
     <div class="login-card">
-      <!-- <div class="box" :class="{ 'box--right': movedToRight }"></div>
-
-      <button @click="movedToRight = false">Move Left</button>
-      <button class="ml-4" @click="movedToRight = true">Move Right</button>
-      <hr class="mt-4" /> -->
-      <!-- <Transition name="showhide">
-        <div class="box1 mt-4" v-if="showing"></div>
-      </Transition>
-
-      <button @click="showing = !showing">Show / Hide</button> -->
       <h2>{{ infoStore.projectName }}</h2>
 
       <div class="text-center">
@@ -147,7 +76,7 @@ function handleSubmit() {
           placeholder="Enter your username"
           v-model="formData.username"
           required
-          ref="username"
+          ref="usernameEl"
         />
 
         <label class="block mt-3">Password</label>
@@ -156,7 +85,7 @@ function handleSubmit() {
           placeholder="Enter password"
           v-model="formData.password"
           required
-          ref="password"
+          ref="passwordEl"
         />
 
         <!-- <p class="text-center mt-3" v-if="loggingIn">Logging in...</p> -->
