@@ -1,3 +1,125 @@
+<script>
+import axios from 'axios';
+import { mapState, mapActions } from 'pinia';
+import { eventBus } from '../utils/eventBus';
+import { setPrivateHeaders } from '../service/axiosInstance';
+import { showErrorMessage, showSuccessMessage } from '../utils/functions';
+import { infoStore } from '../data/info';
+import { useAuthStore } from '../store/authStore';
+import TheButton from '../components/TheButton.vue';
+import { reactive, ref } from 'vue';
+
+const formData = reactive({
+  username: '',
+  password: ''
+});
+
+const loggingIn = ref(false);
+
+const authStore = useAuthStore();
+
+function handleSubmit() {
+  if (!formData.username) {
+    // TODO: show error message on toast
+
+    showErrorMessage('username can not be empty!');
+    // this.$refs.username.focus();
+    return;
+  }
+  if (formData.password.length < 6) {
+    // alert("Password must be at least 6 characters long!");
+    // TODO: show error message on toast
+    showErrorMessage('Password must be at least 6 characters long!');
+    // this.$refs.password.focus();
+
+    return;
+  }
+
+  loggingIn.value = true;
+  axios
+    .post('https://api.rimoned.com/api/pharmacy-management/v1/login', formData)
+    .then((res) => {
+      showSuccessMessage(res);
+      authStore.login(res.data);
+      localStorage.setItem('accessToken', res.data.accessToken);
+      setPrivateHeaders();
+      // this.$router.push('/dashboard');
+    })
+    .catch((err) => {
+      showErrorMessage(err);
+    })
+    .finally(() => {
+      loggingIn.value = false;
+    });
+}
+
+// export default {
+//   data: () => ({
+//     formData: {
+//       username: '',
+//       password: ''
+//     },
+//     loggingIn: false,
+//     movedToRight: false,
+//     showing: false,
+//     projectName: infoStore.projectName
+//   }),
+//   computed: {
+//     ...mapState(useAuthStore, {
+//       username: 'username',
+//       accessToken: 'accessToken',
+//       refreshToken: 'refreshToken',
+//       isLoggedIn: 'isLoggedIn'
+//     })
+//   },
+//   components: {
+//     TheButton
+//   },
+//   methods: {
+//     ...mapActions(useAuthStore, {
+//       login: 'login'
+//     }),
+//     handleSubmit() {
+//       if (!this.formData.username) {
+//         // TODO: show error message on toast
+
+//         showErrorMessage('username can not be empty!');
+//         this.$refs.username.focus();
+//         return;
+//       }
+//       if (this.formData.password.length < 6) {
+//         // alert("Password must be at least 6 characters long!");
+//         // TODO: show error message on toast
+//         showErrorMessage('Password must be at least 6 characters long!');
+//         this.$refs.password.focus();
+
+//         return;
+//       }
+
+//       this.loggingIn = true;
+//       axios
+//         .post(
+//           'https://api.rimoned.com/api/pharmacy-management/v1/login',
+//           this.formData
+//         )
+//         .then((res) => {
+//           showSuccessMessage(res);
+//           this.login(res.data);
+//           localStorage.setItem('accessToken', res.data.accessToken);
+//           setPrivateHeaders();
+//           this.$router.push('/dashboard');
+//         })
+//         .catch((err) => {
+//           showErrorMessage(err);
+//         })
+//         .finally(() => {
+//           this.loggingIn = false;
+//         });
+//     }
+//   }
+// };
+</script>
+
 <template>
   <div class="login-page">
     <div class="login-card">
@@ -11,7 +133,7 @@
       </Transition>
 
       <button @click="showing = !showing">Show / Hide</button> -->
-      <h2>{{ projectName }}</h2>
+      <h2>{{ infoStore.projectName }}</h2>
 
       <div class="text-center">
         <img src="/img/lock.png" class="login-card__icon" alt="" />
@@ -58,83 +180,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import axios from 'axios';
-import { mapState, mapActions } from 'pinia';
-import { eventBus } from '../utils/eventBus';
-import { setPrivateHeaders } from '../service/axiosInstance';
-import { showErrorMessage, showSuccessMessage } from '../utils/functions';
-import { infoStore } from '../data/info';
-import { useAuthStore } from '../store/authStore';
-import TheButton from '../components/TheButton.vue';
-
-export default {
-  data: () => ({
-    formData: {
-      username: '',
-      password: ''
-    },
-    loggingIn: false,
-    movedToRight: false,
-    showing: false,
-    projectName: infoStore.projectName
-  }),
-  computed: {
-    ...mapState(useAuthStore, {
-      username: 'username',
-      accessToken: 'accessToken',
-      refreshToken: 'refreshToken',
-      isLoggedIn: 'isLoggedIn'
-    })
-  },
-  components: {
-    TheButton
-  },
-  methods: {
-    ...mapActions(useAuthStore, {
-      login: 'login'
-    }),
-    handleSubmit() {
-      if (!this.formData.username) {
-        // TODO: show error message on toast
-
-        showErrorMessage('username can not be empty!');
-        this.$refs.username.focus();
-        return;
-      }
-      if (this.formData.password.length < 6) {
-        // alert("Password must be at least 6 characters long!");
-        // TODO: show error message on toast
-        showErrorMessage('Password must be at least 6 characters long!');
-        this.$refs.password.focus();
-
-        return;
-      }
-
-      this.loggingIn = true;
-      axios
-        .post(
-          'https://api.rimoned.com/api/pharmacy-management/v1/login',
-          this.formData
-        )
-        .then((res) => {
-          showSuccessMessage(res);
-          this.login(res.data);
-          localStorage.setItem('accessToken', res.data.accessToken);
-          setPrivateHeaders();
-          this.$router.push('/dashboard');
-        })
-        .catch((err) => {
-          showErrorMessage(err);
-        })
-        .finally(() => {
-          this.loggingIn = false;
-        });
-    }
-  }
-};
-</script>
 
 <style>
 .box {
